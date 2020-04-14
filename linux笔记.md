@@ -93,6 +93,18 @@ tar
 
 alias 创造命令
 
+### zip 和 unzip
+
+`unzip -o -d /home/sunny myfile.zip`   
+
+```
+把myfile.zip文件解压到 /home/sunny/
+-o:不提示的情况下覆盖文件；
+-d:-d /home/sunny 指明将文件解压缩到/home/sunny目录下；
+```
+
+`zip -r myfile.zip ./*`  将当前目录下的所有文件和文件夹全部压缩成myfile.zip文件,－r表示递归压缩子目录下所有文件.
+
 ### grep
 
 `cat .bashrc | grep -P 'alias (?=l)' --color `       grep的断言
@@ -121,6 +133,10 @@ grep -E "[0-9]+" sentence.txt
 ubuntu 修改  `/etc/default/locale`  可以修改默认设置  或者修改.bashrc
 
 `xargs`
+
+### ps
+
+![image-20200413164855954](linux%E7%AC%94%E8%AE%B0/image-20200413164855954.png)
 
 ### find
 
