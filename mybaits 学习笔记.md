@@ -253,7 +253,7 @@ public class SqlsessionUtil {
 </mapper>
 ```
 
-**注意：`namespace`  和`resultType`应该把路径写全，`id`对应的是方法名称，`namespace`对应的是DAO类(在mybatis里叫Mapper类)。==在这里我将`UserMapper.xml`放在了src/main/resourse里面，如果把`UserMapper.xml`放在src/main/java里面需要在pom.xml里面配置过滤==**
+**注意：`namespace`  和`resultType`应该把路径写全，`id`对应的是方法名称，`namespace`对应的是DAO类(在mybatis里叫Mapper类)。_在这里我将`UserMapper.xml`放在了src/main/resourse里面，如果把`UserMapper.xml`放在src/main/java里面需要在pom.xml里面配置过滤_**
 
 过滤这样配置
 
@@ -392,7 +392,7 @@ public interface UserDao {
 - select 标签的几个重要参数参数
   - `id` 方法名称
   - `parameterType`  参数类
-    - ==参数类的使用：参数类需要和接口中定义的一样，在标签里使用时要`${参数名称(和在接口中定义的一致)}`；如果参数类不是基础数据类型而是一个正常的类的话，在标签里使用要`${类的参数名称}`。==比方说 `resultType`是`User`，`User`类里面有`name`、`id`、`pwd`三个参数。那么在标签里填写sql语句时要是用`User`类的参数应该这样(假设select操作)：`select * from user where id=${id} and name=${name} and pwd=${pwd}`。*注意`${}`里面的参数名称和`User`类的参数名称一致*
+    - **参数类的使用：参数类需要和接口中定义的一样，在标签里使用时要`${参数名称(和在接口中定义的一致)}`；如果参数类不是基础数据类型而是一个正常的类的话，在标签里使用要`${类的参数名称}`。**比方说 `resultType`是`User`，`User`类里面有`name`、`id`、`pwd`三个参数。那么在标签里填写sql语句时要是用`User`类的参数应该这样(假设select操作)：`select * from user where id=${id} and name=${name} and pwd=${pwd}`。*注意`${}`里面的参数名称和`User`类的参数名称一致*
   - `resultType` 返回类
 - update delete insert 的几个重要参数
   - `id` 方法名称
