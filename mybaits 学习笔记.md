@@ -393,6 +393,7 @@ public interface UserDao {
   - `id` 方法名称
   - `parameterType`  参数类
     - **参数类的使用：参数类需要和接口中定义的一样，在标签里使用时要`${参数名称(和在接口中定义的一致)}`；如果参数类不是基础数据类型而是一个正常的类的话，在标签里使用要`${类的参数名称}`。**比方说 `resultType`是`User`，`User`类里面有`name`、`id`、`pwd`三个参数。那么在标签里填写sql语句时要是用`User`类的参数应该这样(假设select操作)：`select * from user where id=${id} and name=${name} and pwd=${pwd}`。*注意`${}`里面的参数名称和`User`类的参数名称一致*
+    - ![image-20200415141238657](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200415141238657.png)
   - `resultType` 返回类
 - update delete insert 的几个重要参数
   - `id` 方法名称
@@ -420,3 +421,10 @@ public void TestCRUD(){
 ```
 
 **请注意：增删改操作完成后一定要` sqlSession.commit();`来提交事务**
+
+## 3.xml配置
+
+### 3.1 environments
+
+
+
