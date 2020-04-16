@@ -255,28 +255,24 @@ public class SqlsessionUtil {
 
 **注意：`namespace`  和`resultType`应该把路径写全，`id`对应的是方法名称，`namespace`对应的是DAO类(在mybatis里叫Mapper类)。_在这里我将`UserMapper.xml`放在了src/main/resourse里面，如果把`UserMapper.xml`放在src/main/java里面需要在pom.xml里面配置过滤_**
 
-过滤这样配置
+#### 过滤这样配置
 
 ```xml
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.xml</include>
-        </includes>
-        <filtering>true</filtering>
-      </resource>
+<resources>
       <resource>
         <directory>src/main/java</directory>
         <includes>
-          <include>**/*.properties</include>
           <include>**/*.xml</include>
+          <include>**/*.properties</include>
         </includes>
-        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
 ```
+
+**`filtering`默认是false，故不配置`filtering`。待到需要的时候可以自行配置**
 
 ## 2 .使用模块
 
@@ -424,7 +420,122 @@ public void TestCRUD(){
 
 ## 3.xml配置
 
-### 3.1 environments
+https://mybatis.org/mybatis-3/zh/configuration.html#environments
+
+### 配置文件的文档结构
+
+![image-20200416103707221](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200416103707221.png)
+
+
+
+### `properties`和`environments`配置
+
+- `<properties resource="cn/ssm/suyuesheng/mybatisconfig.properties"/>`指定了properties后可以在后面以`${属性名称}`来使用如👇
+
+```xml
+<environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="su15990904343"/>
+            </dataSource>
+        </environment>
+</environments>
+```
+
+properties标签内部也可定义属性，当标签定义的属性和resource文件的属性冲突时，以resource指定的文件里的属性之为准**相关属性有可能会和pom.xml冲突，解决冲突的办法有两个，一个是修改`.properties`文件里属性的名称，二是修改过滤规则https://blog.csdn.net/u011781521/article/details/79052725**。按笔记中提到的过滤配置方案就可以避免这种情况
+
+- `事务管理器（transactionManager）`包括JDBC和MANAGED 
+
+- `datasource`数据来源，type属性，有三种内建的数据源类型（也就是 type="[UNPOOLED|POOLED|JNDI]"）：可以理解为数据库连接池，`type="UNPOOLED"`就是不用连接池。
+
+- `environments`故名思意支持多个`environment`（`environments`中文可以翻译为工作环境）。但在工作时只能用一个`environment`，用哪个可以在default属性里面设置，如下👇
+
+```xml
+<environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+        <environment id="oracle">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+            </dataSource>
+        </environment>
+</environments>
+```
+
+### 类型别名（typeAliases）
+
+类型别名可为 Java 类型设置一个缩写名字。 它仅用于 XML 配置，意在降低冗余的全限定类名书写。如下👇，将`cn.ssm.suyuesheng.domain.User`指定为`User`，这样在`mapper`配置时指定类型更方便
+
+config.xml
+
+```xml
+<!--    指定类型别名-->
+    <typeAliases>
+        <typeAlias type="cn.ssm.suyuesheng.domain.User" alias="User"/>
+    </typeAliases>
+```
+
+Usermapper.xml
+
+```xml
+<select id="findById" parameterType="int" resultType="User">
+    select * from user where id=#{id}
+</select>
+```
+
+`package`指定使用的包，在config里面的aliases里package指定了使用的包之后，使用包里的类可以使用类名称首字母小写👇
+
+config.xml
+
+```xml
+ <package name="cn.ssm.suyuesheng.domain"/>
+```
+
+Usermapper.xml
+
+```xml
+<!--    在config里面的aliases里package指定了使用的包之后，使用包里的类可以使用类名称首字母小写-->
+    <insert id="insertUser" parameterType="user">
+        insert into user values(#{id},#{name},#{pwd})
+    </insert>
+```
+
+也可使用注解来定义别名，使用了`package`后，在没有注解的情况下，会使用 Bean 的首字母小写的非限定类名来作为它的别名。 比如 `domain.blog.Author` 的别名为 `author`；若有注解，则别名为其注解值。(此时使用小写依然可以)👇
+
+User.java
+
+```java
+@Alias("author")
+public class User {
+    private int id;
+    private String name;
+    private String pwd;
+```
+
+Usermapper.xml
+
+```xml
+<!--    使用了`package`后，在没有注解的情况下，会使用 Bean 的首字母小写的非限定类名来作为它的别名。 比如 `domain.blog.Author` 的别名为 `author`；若有注解，则别名为其注解值。-->
+    <update id="update" parameterType="author">
+        UPDATE user SET pwd=#{pwd},name=#{name} where id=${id}
+    </update>
+```
+
+为一些基础的类型提供了默认的别名👇
+
+![image-20200417004836999](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417004836999.png)
 
 
 
