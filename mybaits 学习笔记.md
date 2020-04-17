@@ -450,7 +450,7 @@ properties标签内部也可定义属性，当标签定义的属性和resource�
 
 - `事务管理器（transactionManager）`包括JDBC和MANAGED 
 
-- `datasource`数据来源，type属性，有三种内建的数据源类型（也就是 type="[UNPOOLED|POOLED|JNDI]"）：可以理解为数据库连接池，`type="UNPOOLED"`就是不用连接池。
+- `datasource`数据来源，type属性，有三种内建的数据源类型（也就是 `type="[UNPOOLED|POOLED|JNDI]"`）：可以理解为数据库连接池，`type="UNPOOLED"`就是不用连接池。
 
 - `environments`故名思意支持多个`environment`（`environments`中文可以翻译为工作环境）。但在工作时只能用一个`environment`，用哪个可以在default属性里面设置，如下👇
 
@@ -537,5 +537,45 @@ Usermapper.xml
 
 ![image-20200417004836999](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417004836999.png)
 
+### 设置 setting
 
+暂时先记住下面几个
+
+![image-20200417013953299](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417013953299.png)
+
+![image-20200417014056957](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417014056957.png)
+
+### 映射器 mappers
+
+![image-20200417020548244](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417020548244.png)
+
+推荐使用第一个，第二个忽略，第三和第四个有两个要求  **1.`mapper.xml`文件必须放在`src/main/java`里面；2.`mapper.xml`的命名必须和接口名一样，比如接口名称`UserMapper.java`那么xml的名称应该是`UserMapper.xml`。_需要注意的是，虽然只有三和四的操作方式要求接口和配置文件名称一致，但是应该把这一条要求作为一个规范，也就是说以后接口和配置文件名称要保持一致 _**
+
+### other
+
+先忽略
+
+## 4.生命周期和作用域
+
+## 5.结果映射
+
+## 6.日志工厂
+
+在config.xml里面配置settings 里面的setting
+
+![image-20200417154336920](mybaits%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/image-20200417154336920.png)
+
+- SLF4J 
+
+- LOG4J （**重点**）
+
+- LOG4J2 
+
+- JDK_LOGGING 
+
+- COMMONS_LOGGING 
+
+- STDOUT_LOGGING （**重点**）
+
+- NO_LOGGING
 
