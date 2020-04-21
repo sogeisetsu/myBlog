@@ -8,6 +8,8 @@
 
 [简明vim](https://coolshell.cn/articles/5426.html#%E7%AC%AC%E4%BA%8C%E7%BA%A7_%E2%80%93_%E6%84%9F%E8%A7%89%E8%89%AF%E5%A5%BD)
 
+[在 Vim 中优雅地查找和替换](https://harttle.land/2016/08/08/vim-search-in-file.html)
+
 ***
 
 **vim博大精深，私以为初学者应掌握三点，这三点分别是`光标移动`、`查找替换`、`正则表达`**，然后应该再了解一下代码高亮，自动填充等内容。
@@ -92,6 +94,12 @@ q: 查看命令行历史
 [断言](http://notes.maxwi.com/2015/12/13/vim-regexp/)
 
 `/tu\(壤\)\@=`是查找后面是壤的tu的意思
+
+### 替换
+
+`:{作用范围}s/{目标}/{替换}/{替换标志}`
+
+![image-20200421112349307](vim%E7%AC%94%E8%AE%B0.assets/image-20200421112349307.png)
 
 
 
