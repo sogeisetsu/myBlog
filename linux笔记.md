@@ -213,7 +213,7 @@ ln -s 是linux中一个非常重要命令，一定要熟悉。它的功能是为
 
 https://www.jianshu.com/p/0ad354929baf
 
-![在这里插入图片描述](E:/blog/linux%E7%AC%94%E8%AE%B0/20200412233628697.png)
+![image-20200422193755698](linux%E7%AC%94%E8%AE%B0.assets/image-20200422193755698.png)
 
 ### centos
 
