@@ -83,6 +83,10 @@ q? 查看使用？输入的搜索历史
 q: 查看命令行历史
 ```
 
+### 6.撤销和反撤销
+
+![image-20200423132149570](vim%E7%AC%94%E8%AE%B0.assets/image-20200423132149570.png)
+
 ### 历史命令
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411202036872.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3N1eXVlcw==,size_16,color_FFFFFF,t_70)
