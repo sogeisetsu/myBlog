@@ -633,7 +633,7 @@ public void testCNameSpace(){
 }
 ```
 
-# 7 <a name=Bean的作用域>Bean的作用域</a>
+# 7 <a name="Bean的作用域">Bean的作用域</a>
 
 | Scope                                                        | Description                                                  |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
@@ -786,7 +786,7 @@ public class Person {
 
 ```
 
-**<a name=phone类>phone类👇</a>**
+**<a name="phone类">phone类👇</a>**
 
 ```java
 package org.suyuesheng.spring.sptu04.pojo;
@@ -815,7 +815,7 @@ public class Phone {
 }
 ```
 
-**<a name=address类>address类👇</a>**
+**<a name="address类">address类👇</a>**
 
 ```java
 package org.suyuesheng.spring.sptu04.pojo;
@@ -848,7 +848,7 @@ public class Address {
 
 ```
 
-**<a name=xml>xml👇</a>**
+**<a name="xml">xml👇</a>**
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1377,9 +1377,17 @@ public void testOne() {
 
 # 10 代理模式
 
+## 10.1 静态代理设计模式
 
+*这个太基础，是java的基础内容，就只放个链接，https://segmentfault.com/a/1190000011291179#item-1*
 
+## 10.2 动态代理
 
+[https://www.sogeisetsugo.tk/myBlog/%E4%BB%A3%E7%90%86%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F](https://www.sogeisetsugo.tk/myBlog/代理设计模式)
+
+[代理设计模式介绍](https://segmentfault.com/a/1190000011291179#item-3)
+
+<img src="http://q9efxddri.bkt.clouddn.com/20200502023924.png"/>
 
 
 
