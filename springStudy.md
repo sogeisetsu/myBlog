@@ -92,7 +92,7 @@ https://blog.csdn.net/weixin_44823472/article/details/97787171
 
 ## 3.1 需要导入的包
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200501161255.png"/>
+![](http://q9efxddri.bkt.clouddn.com/20200502033623.png)
 
 ## 3.2 **面试题 IOC是什么？**
 
@@ -1383,39 +1383,828 @@ public void testOne() {
 
 ## 10.2 动态代理
 
+> 动态代理利用了[JDK API](http://tool.oschina.net/uploads/apidocs/jdk-zh/)，动态地在内存中构建代理对象，从而实现对目标对象的代理功能。动态代理又被称为JDK代理或接口代理。
+>
+> 静态代理与动态代理的区别主要在：
+>
+> - 静态代理在编译时就已经实现，编译完成后代理类是一个实际的class文件
+> - 动态代理是在运行时动态生成的，即编译完成后没有实际的class文件，而是在运行时动态生成类字节码，并加载到JVM中
+>
+> **特点：**
+> 动态代理对象不需要实现接口，但是要求目标对象必须实现接口，否则不能使用动态代理。
+
 [https://www.sogeisetsugo.tk/myBlog/%E4%BB%A3%E7%90%86%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F](https://www.sogeisetsugo.tk/myBlog/代理设计模式)
 
 [代理设计模式介绍](https://segmentfault.com/a/1190000011291179#item-3)
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200502023924.png"/>
+<img src="http://q9efxddri.bkt.clouddn.com/20200502023924.png" style="zoom: 200%;" />
+
+## 10.3 AOP
+
+使用aop需导包
+
+```xml
+<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+    <version>1.9.4</version>
+</dependency>
 
 
 
 
+```
+
+### 10.3.1 什么是 AOP
+
+> ### 什么是 AOP
+>
+> AOP(Aspect-Oriented Programming), 即 **面向切面编程**, 它与 OOP( Object-Oriented Programming, 面向对象编程) 相辅相成, 提供了与 OOP 不同的抽象软件结构的视角.
+> 在 OOP 中, 我们以类(class)作为我们的基本单元, 而 AOP 中的基本单元是 **Aspect(切面)**
+
+### 10.3.2 连接点和切入点区别
+
+> JoinPoints：这些基本上是实际业务逻辑中的位置，您希望在其中插入一些必需的功能，但这些功能不是实际业务逻辑的一部分。 JoinPint的一些示例包括：方法调用，方法正常返回，方法引发异常，实例化对象，引用对象等。
+>
+> 切入点：切入点类似于正则表达式，用于标识连接点。 Pontcuts使用"切入点表达语言"表示。切入点是执行流程中需要应用横切关注点的点。 Joinpoint和Pointcut之间是有区别的。连接点更通用，表示任何我们可以"选择"引入交叉关注点的控制流，而切入点则标识了"我们希望"引入交叉关注点的此类连接点。
+>
+> https://www.codenong.com/15447397/
+
+### 10.3.3 AOP的术语
+
+> **AOP的术语**
+>
+> 嗯，AOP搞了好几个术语出来~~两本书都有讲解这些术语，我会尽量让大家看得明白的：
+>
+> **连接点**(Join point)：
+>
+> - **能够被拦截的地方**：Spring AOP是基于动态代理的，所以是方法拦截的。每个成员方法都可以称之为连接点~
+>
+> **切点**(Poincut)：
+>
+> - **具体定位的连接点**：上面也说了，每个方法都可以称之为连接点，我们**具体定位到某一个方法就成为切点**。
+>
+> **增强/通知**(Advice)：
+>
+> - 表示添加到切点的一段
+>
+>   逻辑代码
+>
+>   ，并定位连接点的
+>
+>   方位信息
+>
+>   。
+>
+>   - 简单来说就定义了是干什么的，具体是在哪干
+>   - Spring AOP提供了5种Advice类型给我们：前置、后置、返回、异常、环绕给我们使用！
+>
+> **织入**(Weaving)：
+>
+> - 将`增强/通知`添加到目标类的具体连接点上的过程。
+>
+> **引入/引介**(Introduction)：
+>
+> - `引入/引介`允许我们**向现有的类添加新方法或属性**。是一种**特殊**的增强！
+>
+> **切面**(Aspect)：
+>
+> - 切面由切点和`增强/通知`组成，它既包括了横切逻辑的定义、也包括了连接点的定义。
+>
+> 在《Spring 实战 (第4版)》给出的总结是这样子的：
+>
+> > 通知/增强包含了需要用于多个应用对象的横切行为；连接点是程序执行过程中能够应用通知的所有点；切点定义了通知/增强被应用的具体位置。其中关键的是切点定义了哪些连接点会得到通知/增强。
+>
+> 总的来说：
+>
+> - 这些术语可能翻译过来不太好理解，但对我们正常使用AOP的话**影响并没有那么大**~~看多了就知道它是什么意思了。
+>
+>
+> 作者：Java3y
+> 链接：https://juejin.im/post/5b06bf2df265da0de2574ee1
+> 来源：掘金
+> 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+### <a name="advice 的类型">**10.3.4 advice 的类型**</a>
+
+> ### advice 的类型
+>
+> - before advice, 在 join point 前被执行的 advice. 虽然 before advice 是在 join point 前被执行, 但是它并不能够阻止 join point 的执行, 除非发生了异常(即我们在 before advice 代码中, 不能人为地决定是否继续执行 join point 中的代码)
+> - after return advice, 在一个 join point 正常返回后执行的 advice
+> - after throwing advice, 当一个 join point 抛出异常后执行的 advice
+> - after(final) advice, 无论一个 join point 是正常退出还是发生了异常, 都会被执行的 advice.
+> - around advice, 在 join point 前和 joint point 退出后都执行的 advice. 这个是最常用的 advice.
 
 
 
+### 10.3.5 通过xml配置aop的两种方式
+
+#### 10.3.5.0 xml头部👇
+
+需要增加aop的约束和命名空间
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:annotation-config/>
+</beans>
+```
 
 
 
+#### **10.3.5.1  通过默认<aop:advisor>来配置**
+
+##### **10.3.5.1.1先定义一个接口和一个目标对象的类**
+
+*接口👇*
+
+```java
+package org.suyuesheng.spring.sptu07.service;
+
+public interface IUser {
+    void add();
+    void delete();
+    void update();
+    void change();
+}
+```
+
+*目标对象的类，实现接口*
+
+```java
+package org.suyuesheng.spring.sptu07.service;
+
+public class UserImpl implements IUser {
+
+    @Override
+    public void add() {
+        System.out.println("目标类UserImpl覆写的add方法");
+    }
+
+    @Override
+    public void delete() {
+        System.out.println("目标类UserImpl覆写的delete方法");
+    }
+
+    @Override
+    public void update() {
+        System.out.println("目标类UserImpl覆写的update方法");
+
+    }
+
+    @Override
+    public void change() {
+        System.out.println("目标类UserImpl覆写的change方法");
+
+    }
+}
+
+```
+
+##### **10.3.5.1.2 定义前置增强类和返回增强类**
+
+**这两个类需要实现相应的接口，接口名称可以参考[advice 的类型](#advice 的类型)(仅仅参考哦！！！)**
+
+*前置增强*👇
+
+```java
+package org.suyuesheng.spring.sptu07.log;
+
+import org.springframework.aop.MethodBeforeAdvice;
+
+import java.lang.reflect.Method;
+
+public class BLog implements MethodBeforeAdvice {
+    @Override
+    public void before(Method method, Object[] objects, Object target) throws Throwable {
+        System.out.println(target.getClass().getName()+"."+method.getName());
+    }
+}
+
+```
+
+*后置返回增强*👇
+
+```java
+package org.suyuesheng.spring.sptu07.log;
+
+import org.springframework.aop.AfterReturningAdvice;
+
+import java.lang.reflect.Method;
+
+public class ALog implements AfterReturningAdvice {
+    @Override
+    public void afterReturning(Object returnValue, Method method, Object[] objects, Object target) throws Throwable {
+        System.out.println(target.getClass().getName()+"."+method.getName());
+        if(returnValue!=null){
+            System.out.println(returnValue.getClass().getName());
+        }
+    }
+}
+```
+
+##### **10.3.5.1.3 在xml中通过aop标签配置**  **重点！！**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:annotation-config/>
+
+    <bean id="user" class="org.suyuesheng.spring.sptu07.service.UserImpl"/>
+    <bean id="afterLog" class="org.suyuesheng.spring.sptu07.log.ALog"/>
+    <bean id="beforeLog" class="org.suyuesheng.spring.sptu07.log.BLog"/>
+
+    <aop:config>
+<!--        配置切入点-->
+        <aop:pointcut id="pointcut" expression="execution(* org.suyuesheng.spring.sptu07.service.UserImpl.*(..))"/>
+<!--        配置环绕增强-->
+        <aop:advisor advice-ref="afterLog" pointcut-ref="pointcut"/>
+        <aop:advisor advice-ref="beforeLog" pointcut-ref="pointcut"/>
+    </aop:config>
+</beans>
+```
+
+#### 10.3.5.2 通过自定义切面来配置
+
+##### 10.3.5.2.1 接口和实现接口的类
+
+```java
+package org.suyuesheng.spring.sptu07.service;
+
+public interface IPerson {
+    void add();
+    void delete();
+    void update();
+    void change();
+
+}
+
+```
+
+```java
+package org.suyuesheng.spring.sptu07.service;
+
+public class PersonImpl implements IPerson {
+    @Override
+    public void add() {
+        System.out.println("add");
+    }
+
+    @Override
+    public void delete() {
+        System.out.println("delete");
+    }
+
+    @Override
+    public void update() {
+        System.out.println("update");
+    }
+
+    @Override
+    public void change() {
+        System.out.println("change");
+    }
+}
+
+```
+
+##### **10.3.5.2.2  自定义切面类**
+
+> **切面**(Aspect)：
+>
+> - 切面由切点和`增强/通知`组成，它既包括了横切逻辑的定义、也包括了连接点的定义。
+
+**该类无须实现特殊接口**
+
+```java
+package org.suyuesheng.spring.sptu07.log;
+
+public class PersonLog {
+    public void methodBefore(){
+        System.out.println("方法执行之前");
+
+    }
+    public void afterMethod(){
+        System.out.println("方法执行之后");
+    }
+}
+
+```
+
+##### **10.3.5.2.3 xml里面自定义切面配置   重点！！！**
+
+**看第二种方式👇**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:annotation-config/>
+<!--    第一种方式-->
+    <bean id="user" class="org.suyuesheng.spring.sptu07.service.UserImpl"/>
+    <bean id="afterLog" class="org.suyuesheng.spring.sptu07.log.ALog"/>
+    <bean id="beforeLog" class="org.suyuesheng.spring.sptu07.log.BLog"/>
+
+    <aop:config>
+<!--        配置切入点-->
+        <aop:pointcut id="pointcut" expression="execution(* org.suyuesheng.spring.sptu07.service.UserImpl.*(..))"/>
+<!--        配置环绕增强-->
+        <aop:advisor advice-ref="afterLog" pointcut-ref="pointcut"/>
+        <aop:advisor advice-ref="beforeLog" pointcut-ref="pointcut"/>
+    </aop:config>
+
+<!--    第二种方式-->
+    <bean id="person" class="org.suyuesheng.spring.sptu07.service.PersonImpl"/>
+    <bean id="personLog" class="org.suyuesheng.spring.sptu07.log.PersonLog"/>
+
+    <aop:config>
+<!--        自定义切面-->
+<!--        ref 指定切面类-->
+        <aop:aspect ref="personLog" >
+            <aop:pointcut id="bpl" expression="execution(* org.suyuesheng.spring.sptu07.service.PersonImpl.*(..))"/>
+<!--            ref指定切入点-->
+            <aop:before method="methodBefore" pointcut-ref="bpl"/>
+            <aop:after method="afterMethod" pointcut-ref="bpl"/>
+        </aop:aspect>
+    </aop:config>
+<!--第三种方式-->
+<!--    自动代理，使用了这个标签，才可以使用aop开发-->
+    <aop:aspectj-autoproxy/>
+    <bean id="phone" class="org.suyuesheng.spring.sptu07.service.PhoneImpl"/>
+    <bean id="AnnoLog" class="org.suyuesheng.spring.sptu07.log.AnnotationLog"/>
+</beans>
+```
+
+### 10.3.6 使用注解配置aop
+
+要想使用注解，必须在Beans.xml里面开启aop注解👇
+
+```xml
+<aop:aspectj-autoproxy/>
+```
+
+#### @Aspect
+
+使用该注解的类会变成一个切面
+
+#### @Before、@After、@AfterReturning、@Around
+
+这是配置增强的注解，后面括号的参数如`"execution(* org.suyuesheng.spring.sptu07.service.PhoneImpl.*(..))"`叫**切点标志符(designator)**
+
+> #### 切点标志符(designator)
+>
+> AspectJ5 的切点表达式由标志符(designator)和操作参数组成. 如 "execution( *greetTo(..))" 的切点表达式, **execution** 就是 标志符, 而圆括号里的* greetTo(..) 就是操作参数
+>
+> ##### execution
+>
+> 匹配 join point 的执行, 例如 "execution(* hello(..))" 表示匹配所有目标类中的 hello() 方法. 这个是最基本的 pointcut 标志符.
+>
+> ##### within
+>
+> 匹配特定包下的所有 join point, 例如 `within(com.xys.*)` 表示 com.xys 包中的所有连接点, 即包中的所有类的所有方法. 而 `within(com.xys.service.*Service)` 表示在 com.xys.service 包中所有以 Service 结尾的类的所有的连接点.
+>
+> ##### this 与 target
+>
+> this 的作用是匹配一个 bean, 这个 bean(Spring AOP proxy) 是一个给定类型的实例(instance of). 而 target 匹配的是一个目标对象(target object, 即需要织入 advice 的原始的类), 此对象是一个给定类型的实例(instance of).
+>
+> ##### bean
+>
+> 匹配 bean 名字为指定值的 bean 下的所有方法, 例如:
+>
+> ```
+> bean(*Service) // 匹配名字后缀为 Service 的 bean 下的所有方法
+> bean(myService) // 匹配名字为 myService 的 bean 下的所有方法
+> ```
+>
+> ##### args
+>
+> 匹配参数满足要求的的方法.
+>
+> 来源 https://segmentfault.com/a/1190000007469968#item-3-6
+
+#### 切点标识符👇
+
+<div class="sect4">
+<h5 id="aop-pointcuts-examples" tabindex="-1"><a class="anchor" href="#aop-pointcuts-examples"></a>Examples</h5>
+<div class="paragraph">
+<p>Spring AOP users are likely to use the <code>execution</code> pointcut designator the most often.
+The format of an execution expression follows:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(modifiers-pattern? ret-type-pattern declaring-type-pattern?name-pattern(param-pattern)
+                throws-pattern?)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All parts except the returning type pattern (<code>ret-type-pattern</code> in the preceding snippet),
+the name pattern, and the parameters pattern are optional. The returning type pattern determines
+what the return type of the method must be in order for a join point to be matched.
+<code>*</code> is most frequently used as the returning type pattern. It matches any return
+type. A fully-qualified type name matches only when the method returns the given
+type. The name pattern matches the method name. You can use the <code>*</code> wildcard as all or
+part of a name pattern. If you specify a declaring type pattern,
+include a trailing <code>.</code> to join it to the name pattern component.
+The parameters pattern is slightly more complex: <code>()</code> matches a
+method that takes no parameters, whereas <code>(..)</code> matches any number (zero or more) of parameters.
+The <code>(*)</code> pattern matches a method that takes one parameter of any type.
+<code>(*,String)</code> matches a method that takes two parameters. The first can be of any type, while the
+second must be a <code>String</code>. Consult the
+<a href="https://www.eclipse.org/aspectj/doc/released/progguide/semantics-pointcuts.html">Language
+Semantics</a> section of the AspectJ Programming Guide for more information.</p>
+</div>
+<div class="paragraph">
+<p>The following examples show some common pointcut expressions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The execution of any public method:</p>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(public * *(..))</pre>
+</div>
+</div>
+</li>
+<li>
+<p>The execution of any method with a name that begins with <code>set</code>:</p>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(* set*(..))</pre>
+</div>
+</div>
+</li>
+<li>
+<p>The execution of any method defined by the <code>AccountService</code> interface:</p>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(* com.xyz.service.AccountService.*(..))</pre>
+</div>
+</div>
+</li>
+<li>
+<p>The execution of any method defined in the <code>service</code> package:</p>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(* com.xyz.service.*.*(..))</pre>
+</div>
+</div>
+</li>
+<li>
+<p>The execution of any method defined in the service package or one of its sub-packages:</p>
+<div class="literalblock">
+<div class="content">
+<pre>    execution(* com.xyz.service..*.*(..))</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+#### 注解配置aop的代码👇
+
+```java
+package org.suyuesheng.spring.sptu07.log;
+
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+
+//使用 @Aspect 让该类变成一个切面
+@Aspect
+public class AnnotationLog {
+
+    @Before("execution(* org.suyuesheng.spring.sptu07.service.PhoneImpl.*(..))")
+    public void before(){
+        System.out.println("前置增强");
+    }
+    @After("execution(* org.suyuesheng.spring.sptu07.service.PhoneImpl.*(..))")
+    public void after(){
+        System.out.println("后置增强");
+    }
+    @Around("execution(* org.suyuesheng.spring.sptu07.service.PhoneImpl.*(..))")
+    public Object around(ProceedingJoinPoint point) throws Throwable {
+
+        System.out.println("环绕前");
+        Object proceed = point.proceed();
+        System.out.println("环绕后");
+        System.out.println(point.getSignature().toString());
+        return proceed;
+
+    }
+    @AfterReturning("execution(* org.suyuesheng.spring.sptu07.service.PhoneImpl.*(..))")
+    public void afterReturn(){
+        System.out.println("返回增强");
+    }
+}
+
+```
+
+#### @Pointcut
+
+配置切入点
+
+> 在Spring 2.0中，Pointcut的定义包括两个部分：Pointcut表示式(expression)和Pointcut签名(signature)
+>
+> ```java
+> //Pointcut表示式
+> @Pointcut("execution(* com.savage.aop.MessageSender.*(..))")
+> //Point签名
+> private void log(){} 
+> ```
+>
+> 然后要使用所定义的Pointcut时，可以指定Pointcut签名
+> 如下：
+>
+> ```java
+> @Before("log()")
+> ```
+>
+> 这种使用方式等同于以下方式，直接定义execution表达式使用
+>
+> ```java
+> @Before("execution(* com.savage.aop.MessageSender.*(..))")
+> ```
+>
+> 
+>
+> 来源 https://www.cnblogs.com/liaojie970/p/7883687.html
 
 
 
+### 10.3.7 几个增强的先后顺序
+
+```
+环绕前
+前置增强
+add方法被执行
+环绕后
+后置增强
+返回增强
+```
+
+### 报错：java.lang.ClassCastException: com.sun.proxy.$Proxy17 cannot be cast to
+
+原因是获得实例的时候设置的返回值不是接口，用了aop，返回值就得是接口。**因为动态代理的是接口**
+
+# 11 mybatis-Spring
+
+http://mybatis.org/spring/zh/index.html
+
+## mybatis笔记 
+
+https://www.cnblogs.com/sogeisetsu/p/12779674.html
+
+## 导包
+
+相比之前，额外导入了
+
+```xml
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis-spring</artifactId>
+    <version>2.0.4</version>
+</dependency>
+```
+
+**这样，就有如下的包**
+
+![](http://q9efxddri.bkt.clouddn.com/20200503051222.png)
+
+## Beans.xml
+
+Beans.xml里面配置上sqlsession，sqlsessionfactory，mapper等原先需要在使用的时候new出来的东西
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config/>
+    <context:component-scan base-package="org.suyuesheng.spring.mybatis"/>
+
+<!--    配置dataSource-->
+<!--    相当于配置mybatis.config.xml里面的datasourse标签-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3307/mybatisstudy?characterEncoding=utf-8&amp;useUnicode=true"/>
+        <property name="username" value="root"/>
+        <property name="password" value="15990904343"/>
+
+    </bean>
+
+<!--    配置sqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+<!--        相当于<datasouse>-->
+        <property name="dataSource" ref="dataSource" />
+<!--        指定配置mybatis.config.xml的位置，这样可以相互补充，比如在sqlSessionFactory的bean里可以配置typealise，也可以在mybatis.config.xml配置-->
+        <property name="configLocation" value="classpath:mybatis.config.xml"/>
+<!--        相当于<mappers><mapper resource=org/suyuesheng/spring/mybatis/mapper/*.xml/></mappers>-->
+<!--        指定mapper.xml的位置-->
+        <property name="mapperLocations" value="classpath:org/suyuesheng/spring/mybatis/mapper/*.xml"/>
+    </bean>
+
+    <bean id="user" class="org.suyuesheng.spring.mybatis.pojo.User"/>
+
+<!--    配置sqlsession-->
+<!--    SqlSessionTemplate是一个代理类，内部它会为每次请求创建线程安全的sqlsession，并与Spring进行集成，在方法执行完毕之后会自动关闭。-->
+<!--    配置好的SqlSession将自动完成commit，并在执行完sql之后自动close。-->
+    <bean id="sqlsession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+<!--        只能通过构造器注入，因为没有setter方法-->
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
 
 
+<!--    配置mapper-->
+    <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="org.suyuesheng.spring.mybatis.mapper.UserMapper"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+</beans>
+```
 
+## 配置mapper的三个方法
 
+```xml
+<!--    法一：配置mapper-->
+<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="mapperInterface" value="org.suyuesheng.spring.mybatis.mapper.UserMapper"/>
+    <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+</bean>
 
+<!--    获取mapper的其他方法-->
+<!--   法二：使用实现mapper接口的方法来获取mapper -->
+<bean id="userMapper1" class="org.suyuesheng.spring.mybatis.mapper.UserMapperImpl">
+    <property name="sqlSession" ref="sqlsession"/>
+</bean>
+<!--    法三：借助SqlSessionDaoSupport,即userMapperImpl2继承了SqlSessionDaoSupport-->
+<bean id="userMapperImpl2" class="org.suyuesheng.spring.mybatis.mapper.UserMapperImpl2">
+    <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+</bean>
+```
 
+- **先说法一，最省劲，配置MapperFactoryBean，指定mapperInterface(mapper接口)即可，无须生成接口的实现类再导入spring容器**
 
+- 法二：最费劲，要整个mapper接口的实现类，然后实现类里面指定一个sqlsession的属性，**SqlSessionTemplate是一个代理类，内部它会为每次请求创建线程安全的sqlsession，并与Spring进行集成，在方法执行完毕之后会自动关闭。**
 
+  ```java
+  package org.suyuesheng.spring.mybatis.mapper;
+  
+  import org.apache.ibatis.session.SqlSession;
+  import org.suyuesheng.spring.mybatis.pojo.User;
+  
+  import java.util.List;
+  
+  public class UserMapperImpl implements UserMapper {
+      private SqlSession sqlSession;
+  
+      public void setSqlSession(SqlSession sqlSession) {
+          this.sqlSession = sqlSession;
+      }
+  
+      @Override
+      public List<User> findAll() {
+          return sqlSession.getMapper(UserMapper.class).findAll();
+      }
+  }
+  ```
 
+- 法三，接口的实现类要继承SqlSessionDaoSupport
 
+  > **SqlSessionDaoSupport**
+  >
+  > `SqlSessionDaoSupport` 是一个抽象的支持类，用来为你提供 `SqlSession`。调用 `getSqlSession()` 方法你会得到一个 `SqlSessionTemplate`，之后可以用于执行 SQL 方法，就像下面这样:
+  >
+  > ```
+  > public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
+  >   public User getUser(String userId) {
+  >     return getSqlSession().selectOne("org.mybatis.spring.sample.mapper.UserMapper.getUser", userId);
+  >   }
+  > }
+  > ```
+  >
+  > 在这个类里面，通常更倾向于使用 `MapperFactoryBean`，因为它不需要额外的代码。但是，如果你需要在 DAO 中做其它非 MyBatis 的工作或需要一个非抽象的实现类，那么这个类就很有用了。
+  >
+  > `SqlSessionDaoSupport` 需要通过属性设置一个 `sqlSessionFactory` 或 `SqlSessionTemplate`。如果两个属性都被设置了，那么 `SqlSessionFactory` 将被忽略。
+  >
+  > 假设类 `UserMapperImpl` 是 `SqlSessionDaoSupport` 的子类，可以编写如下的 Spring 配置来执行设置：
+  >
+  > ```
+  > <bean id="userDao" class="org.mybatis.spring.sample.dao.UserDaoImpl">
+  >   <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+  > </bean>
+  > ```
 
+  ```java
+  package org.suyuesheng.spring.mybatis.mapper;
+  
+  import org.mybatis.spring.support.SqlSessionDaoSupport;
+  import org.suyuesheng.spring.mybatis.pojo.User;
+  
+  import java.util.List;
+  
+  public class UserMapperImpl2 extends SqlSessionDaoSupport implements UserMapper {
+      @Override
+      public List<User> findAll() {
+          return getSqlSession().getMapper(UserMapper.class).findAll();
+      }
+  }
+  
+  ```
 
+  
 
+## 事务
 
+这样的话，如果一个事务出错，不会对数据库造成损伤
 
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:annotation-config/>
+    <import resource="MybatisDaoBeans.xml"/>
+    <bean id="user" class="org.suyuesheng.smybatis.event.pojo.User">
+    </bean>
+    <bean id="userService" class="org.suyuesheng.smybatis.event.service.UserService">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <property name="user" ref="user"/>
+    </bean>
+<!--    事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <constructor-arg ref="dataSource" />
+    </bean>
+<!--    配置事务增强-->
+    <tx:advice transaction-manager="transactionManager" id="txAdvice">
+        <tx:attributes>
+            <tx:method name="findAll" propagation="REQUIRED"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config proxy-target-class="true">
+<!--        配置切入点-->
+        <aop:pointcut id="txPonitCut" expression="execution(* org.suyuesheng.smybatis.event..*(..)) and !execution(* org.suyuesheng.smybatis.event.TestEv.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPonitCut"/>
+    </aop:config>
+</beans>
+```
+
+`<aop:config proxy-target-class="true">`中的`proxy-target-class`如果是true，则是基于类代理，若是false(默认值)则是基于接口代理，实际上，spring版本大于4，不去设定即可，spring将自动决定基于什么代理。
+
+https://blog.csdn.net/lan12334321234/article/details/70048780
 
 
 
