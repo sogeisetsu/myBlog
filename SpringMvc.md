@@ -1002,9 +1002,19 @@ https://blog.csdn.net/weixin_39220472/article/details/80725574   👈此文章�
 
     ![](http://q9efxddri.bkt.clouddn.com/20200513013948.png)
 
-# 联系mybatis
+# 7 联系mybatis
 
-**sql语句👇**
+## 7.0.1 文件结构
+
+![](http://q9efxddri.bkt.clouddn.com/20200515164852.png)
+
+## github地址
+
+https://github.com/sogeisetsu/springstudyy/tree/master/sptumvc-07
+
+## 7.1 建表
+
+### 7.1.1 **sql语句👇**
 
 ```sql
 create database if not exists springstudy character set utf8;
@@ -1028,5 +1038,895 @@ insert into springstudy.user values(4,'alicy','1223456','Y','001');
 insert into springstudy.user values(5,'timi','1223456','Y','001');
 insert into springstudy.user values(6,'tom','1223456','Y','001');
 insert into springstudy.user values(7,'jckman','1223456','Y','001');
+alter table springstudy.user modify uid int auto_increment;
+alter table springstudy.user add `date` DATETIME;
 ```
 
+### 7.1.2 表的结构
+
+| Field    | Type          | Null | Key  | Default | Extra           |
+| :------- | :------------ | :--- | :--- | :------ | :-------------- |
+| uid      | int\(11\)     | NO   | PRI  | NULL    | auto\_increment |
+| username | varchar\(20\) | NO   |      | NULL    |                 |
+| password | varchar\(20\) | NO   |      | NULL    |                 |
+| status   | char\(1\)     | YES  |      | NULL    |                 |
+| code     | varchar\(50\) | YES  |      | NULL    |                 |
+| date     | datetime      | YES  |      | NULL    |                 |
+
+## 7.2 mybatis配置
+
+### 7.2.1 mybatis在spring容器
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:component-scan base-package="org.suyuesheng.spring7"/>
+    <context:annotation-config/>
+    <import resource="springmvcconfig.xml"/>
+    <context:property-placeholder location="classpath:druid.properties"/>
+<!--    datasource-->
+<!--    连接池 druid-->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.name}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+
+        <property name="timeBetweenEvictionRunsMillis" value="${jbbc.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${jdbc.validationQuery}"/>
+        <property name="testWhileIdle" value="true"/>
+    </bean>
+<!--    sqlsessionFactory-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatisConfig.xml"/>
+        <property name="mapperLocations" value="classpath:org/suyuesheng/spring7/mapper/*.xml"/>
+    </bean>
+<!--sqlsession-->
+    <bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate" scope="prototype">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
+    
+<!--mapper或service类-->
+    <bean class="org.suyuesheng.spring7.mapper.UserMapperImpl" id="userMapper">
+        <property name="sqlSession" ref="sqlSessionTemplate"/>
+    </bean>
+    <bean class="org.suyuesheng.spring7.services.UserService" id="userservice">
+        <property name="userMapper" ref="userMapper"/>
+    </bean>
+</beans>
+```
+
+### 7.2.2 druid 连接池
+
+**druid.properties👇**
+
+```properties
+jdbc.url=jdbc:mysql://localhost:3307/springstudy?characterEncoding=utf-8&useUnicode=true
+jdbc.name=root
+jdbc.password=15990904343
+jdbc.initialSize=5
+jdbc.minIdle=5
+jdbc.maxActive=10
+jdbc.maxWait=10000
+#配置间隔多久启动一次DestroyThread，对连接池内的连接才进行一次检测，单位是毫秒
+#检测时:1.如果连接空闲并且超过minIdle以外的连接，如果空闲时间超过minEvictableIdleTimeMillis设置的值则直接物理关闭。
+#     2.在minIdle以内的不处理。
+jbbc.timeBetweenEvictionRunsMillis=600000
+#配置一个连接在池中最大空闲时间，单位是毫秒
+jdbc.minEvictableIdleTimeMillis=300000
+#用来检测连接是否有效的sql，要求是一个查询语句，常用select 'x'。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。
+#mysql select 1
+#oracle select 1 from dual
+jdbc.validationQuery=select 1
+#建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+jdbc.testWhileIdle=true
+```
+
+### 7.2.3 mybatisConfig.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <setting name="logImpl" value="LOG4J"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+    <typeAliases>
+        <package name="org.suyuesheng.spring7.pojo"/>
+    </typeAliases>
+</configuration>
+```
+
+### 7.2.4 log4j配置
+
+```properties
+log4j.rootLogger=DEBUG,console,rollingFile
+#表示Logger会在父Logger的appender里输出，默认为true
+log4j.additivity.org.apache=true
+
+# 控制台(console)
+log4j.appender.console=org.apache.log4j.ConsoleAppender
+#指定日志信息的最低输出级别
+log4j.appender.console.Threshold=DEBUG
+#表示所有消息都会被立即输出，设为false则不输出，默认值是true
+log4j.appender.console.ImmediateFlush=true
+#默认值是System.out。
+log4j.appender.console.Target=System.out
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+log4j.appender.console.layout.ConversionPattern=[%d{yyyy/MM/dd HH:mm:ss,SSS}][%c.%M]%p:%m%n
+
+
+# 回滚文件(rollingFile)
+log4j.appender.rollingFile=org.apache.log4j.RollingFileAppender
+log4j.appender.rollingFile.Threshold=WARN
+log4j.appender.rollingFile.ImmediateFlush=true
+log4j.appender.rollingFile.Append=true
+log4j.appender.rollingFile.File=D:/logs/log.log4j3
+log4j.appender.rollingFile.MaxFileSize=10mb
+#指定可以产生的滚动文件的最大数，例如，设为2则可以产生logging.log4j.1，logging.log4j.2两个滚动文件和一个logging.log4j文件。
+log4j.appender.rollingFile.MaxBackupIndex=50
+log4j.appender.rollingFile.layout=org.apache.log4j.PatternLayout
+log4j.appender.rollingFile.layout.ConversionPattern=[%-5p] %d(%r) --> [%t] %l: %m %x %n
+
+# 日志输出级别
+log4j.logger.org.suyuesheng=DEBUG
+log4j.logger.java.sql=DEBUG
+```
+
+### 7.2.5 mapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.suyuesheng.spring7.mapper.UserMapper">
+    <cache
+            eviction="FIFO"
+            flushInterval="60000"
+            size="512"
+            readOnly="true"/>
+    <resultMap id="userMap" type="user">
+        <result property="uId" column="uid"/>
+        <result property="userName" column="username"/>
+    </resultMap>
+    <select id="findAll" resultType="user">
+        select * from springstudy.user
+    </select>
+
+    <select id="findById" resultType="user" parameterType="_int">
+        select * from springstudy.user
+        <where>
+            <if test="uId!=null">
+                uid=#{uId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="user">
+        insert into springstudy.user
+        <choose>
+            <when test="uId==null">
+                (username, password, status, code, date)
+                values(#{userName},#{password},#{status},#{code},#{date})
+            </when>
+            <when test="uId!=null">
+                (uid, username, password, status, code, date)
+                values(#{uId},#{userName},#{password},#{status},#{code},#{date})
+            </when>
+        </choose>
+    </insert>
+
+
+</mapper>
+```
+
+### 7.2.6 pom.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.suyuesheng.spring7</groupId>
+  <artifactId>sptumvc-07</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <repositories>
+    <repository>
+      <id>alimaven</id>
+      <name>aliyun maven</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.68</version>
+    </dependency>
+<!--    数据库连接池-->
+    <!-- https://mvnrepository.com/artifact/c3p0/c3p0 -->
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.1.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.1.22</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.19</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>
+      <version>2.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.9.4</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>5.2.5.RELEASE</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>5.2.5.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.8</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.2.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+            <encoding>utf-8</encoding>
+          </configuration>
+        </plugin>
+        <plugin>
+
+          <groupId>org.apache.tomcat.maven</groupId>
+
+          <artifactId>tomcat7-maven-plugin</artifactId>
+
+          <version>2.2</version>
+          <configuration>
+            <uriEncoding>UTF-8</uriEncoding>
+          </configuration>
+
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
+
+```
+
+# 8 一个真实的开发总结
+
+## 8.1 网站地址
+
+http://106.14.162.154:8086/
+
+![](http://q9efxddri.bkt.clouddn.com/20200521173132.png)
+
+## 8.2 代码文件
+
+https://github.com/sogeisetsu/springstudyy/tree/master/sptumvc-07
+
+### sql建表
+
+```sql
+show databases ;
+create database if not exists springstudy character set utf8;
+use springstudy;
+create table `User` (
+                        `uid` int primary key ,
+                        `username` varchar(20) not null ,
+                        `password` varchar(20) not null ,
+                        `status` char(1),
+                        `code` varchar(50),
+                        constraint check_status check ( status='Y'or 'N')
+);
+show tables ;
+desc User;
+alter table User modify uid int auto_increment;
+alter table User modify uid int auto_increment;
+alter table User modify username varchar(20) unique not null ;
+
+alter table User add `date` DATETIME;
+alter table User add `email` varchar(25);
+```
+
+### 表格结构
+
+| Field    | Type          | Null | Key  | Default | Extra           |
+| :------- | :------------ | :--- | :--- | :------ | :-------------- |
+| uid      | int\(11\)     | NO   | PRI  | NULL    | auto\_increment |
+| username | varchar\(20\) | NO   | UNI  | NULL    |                 |
+| password | varchar\(20\) | NO   |      | NULL    |                 |
+| status   | char\(1\)     | YES  |      | NULL    |                 |
+| code     | varchar\(50\) | YES  |      | NULL    |                 |
+| date     | datetime      | YES  |      | NULL    |                 |
+| email    | varchar\(25\) | YES  |      | NULL    |                 |
+
+### 配置文件关系图
+
+![](http://q9efxddri.bkt.clouddn.com/20200521173952.png)
+
+### 导包
+
+![](http://q9efxddri.bkt.clouddn.com/20200521201211.png)
+
+### web.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+<!--静态资源的名字和controller的路径名字相同，需要特殊配置让其走tomcat默认的servlet-->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/login.html</url-pattern>
+    <url-pattern>/regist.html</url-pattern>
+  </servlet-mapping>
+<!--  配置spring的DispatcherServlet-->
+  <servlet>
+    <servlet-name>springmvc06</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:Beans.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc06</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+<!--配置字符编码-->
+
+  <filter>
+    <filter-name>filterForCharSet</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceRequestEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceResponseEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>filterForCharSet</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+<!--  配置session存活时间-->
+  <session-config>
+    <session-timeout>40</session-timeout>
+  </session-config>
+<!--  配置初始页面-->
+  <welcome-file-list>
+    <welcome-file>login.html</welcome-file>
+  </welcome-file-list>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error/sea-404page.html</location>
+  </error-page>
+  <error-page>
+    <error-code>405</error-code>
+    <location>/error/405.html</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error/500.html</location>
+  </error-page>
+</web-app>
+```
+
+### springmvc 配置（springmvcconfig.xml）
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="org.suyuesheng.spring7"/>
+    <!--        @Response乱码问题解决-->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" >
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/plain;charset=utf-8</value>
+                            <value>text/html;charset=UTF-8</value>
+                            <value>applicaiton/*;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven/>
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+</beans>
+```
+
+### 数据库配置(mybatisBean.xml)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <context:component-scan base-package="org.suyuesheng.spring7"/>
+    <context:annotation-config/>
+    <import resource="springmvcconfig.xml"/>
+<!--    引入配置文件-->
+    <context:property-placeholder location="classpath:druid.properties"/>
+<!--    datasource-->
+<!--    连接池 druid-->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.name}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <property name="initialSize" value="${jdbc.initialSize}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+
+        <property name="maxWait" value="${jdbc.maxWait}"/>
+
+        <property name="timeBetweenEvictionRunsMillis" value="${jbbc.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${jdbc.validationQuery}"/>
+        <property name="testWhileIdle" value="true"/>
+    </bean>
+<!--    sqlsessionFactory-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatisConfig.xml"/>
+        <property name="mapperLocations" value="classpath:org/suyuesheng/spring7/mapper/*.xml"/>
+    </bean>
+<!--sqlsession-->
+<!--    MapperScannerConfigurer会自动代理，其实不用配置-->
+<!--    <bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate" scope="prototype">-->
+<!--        <constructor-arg index="0" ref="sqlSessionFactory"/>-->
+<!--    </bean>-->
+
+    <!--    自动代理mapper接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" id="mapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="org.suyuesheng.spring7.mapper"/>
+    </bean>
+
+    <bean class="org.suyuesheng.spring7.services.UserService" id="userservice">
+        <property name="userMapper" ref="userMapper"/>
+    </bean>
+
+<!--    配置事务管理器-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+
+    <tx:advice transaction-manager="transactionManager" id="interceptor">
+        <tx:attributes >
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="tx" expression="execution(* org.suyuesheng.spring7.services.*.*(..))"/>
+        <aop:advisor advice-ref="interceptor" pointcut-ref="tx"/>
+    </aop:config>
+</beans>
+```
+
+### druid连接池配置 （druid.properties）
+
+```properties
+jdbc.url=jdbc:mysql://106.14.162.154:3306/springstudy?characterEncoding=utf-8&useUnicode=true
+jdbc.name=root
+jdbc.password=密码是常规密码
+jdbc.initialSize=5
+jdbc.minIdle=5
+jdbc.maxActive=10
+jdbc.maxWait=10000
+#配置间隔多久启动一次DestroyThread，对连接池内的连接才进行一次检测，单位是毫秒
+#检测时:1.如果连接空闲并且超过minIdle以外的连接，如果空闲时间超过minEvictableIdleTimeMillis设置的值则直接物理关闭。
+#     2.在minIdle以内的不处理。
+jbbc.timeBetweenEvictionRunsMillis=600000
+#配置一个连接在池中最大空闲时间，单位是毫秒
+jdbc.minEvictableIdleTimeMillis=300000
+#用来检测连接是否有效的sql，要求是一个查询语句，常用select 'x'。如果validationQuery为null，testOnBorrow、testOnReturn、testWhileIdle都不会起作用。
+#mysql select 1
+#oracle select 1 from dual
+jdbc.validationQuery=select 1
+#建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+jdbc.testWhileIdle=true
+```
+
+
+
+### 数据库配置 （mybatisConfig.xml）
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <setting name="logImpl" value="LOG4J"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+    <typeAliases>
+        <package name="org.suyuesheng.spring7.pojo"/>
+    </typeAliases>
+</configuration>
+```
+
+### Beans.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc
+       https://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="org.suyuesheng.spring7"/>
+    <import resource="mybatisBean.xml"/>
+    <import resource="springmvcconfig.xml"/>
+    <bean class="org.suyuesheng.spring7.pojo.User" id="user"/>
+<!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/"/>
+            <mvc:mapping path="/**"/>
+            <mvc:mapping path="/**/*.html"/>
+            <mvc:mapping path="/index.html"/>
+            <mvc:exclude-mapping path="/login*"/>
+            <mvc:exclude-mapping path="/regist*"/>
+            <mvc:exclude-mapping path="/**/*.js"/>
+            <mvc:exclude-mapping path="/**/*.css"/>
+            <mvc:exclude-mapping path="/bootstrap-3.3.7-dist/**"/>
+            <mvc:exclude-mapping path="/img/**"/>
+            <mvc:exclude-mapping path="/active"/>
+            <bean class="org.suyuesheng.spring7.interceptor.Logininterceptor" id="logininterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>
+```
+
+## 8.3 开发过程中遇到的问题
+
+### druid配置相关资料
+
+https://my.oschina.net/xzfx/blog/478482
+
+https://www.jianshu.com/p/e75d73129f51
+
+https://blog.csdn.net/sjtu_chenchen/article/details/77618967
+
+### MapperScannerConfigurer配置
+
+https://www.cnblogs.com/daxin/p/3545040.html
+
+###  aop中的propagation的7种配置的意思
+
+https://my.oschina.net/wangyongzhi/blog/631200
+
+> 下面是Spring中Propagation类的事务属性详解： 
+> REQUIRED：支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。 
+> SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行。 
+> MANDATORY：支持当前事务，如果当前没有事务，就抛出异常。 
+> REQUIRES_NEW：新建事务，如果当前存在事务，把当前事务挂起。 
+> NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。 
+> NEVER：以非事务方式执行，如果当前存在事务，则抛出异常。 
+> NESTED：支持当前事务，如果当前事务存在，则执行一个嵌套事务，如果当前没有事务，就新建一个事务。 
+
+### spring mvc路径匹配原则
+
+![](http://q9efxddri.bkt.clouddn.com/20200521180449.png)
+
+### 静态资源和controller重名
+
+静态资源的名字和controller的路径名字相同，需要特殊配置让其走tomcat默认的servlet
+
+比如说有个静态资源叫hello.html 有个controller的路径是/hello。那么访问`localhost/hello.html`的时候会自动跳转到`localhost/hello`。为了避免这种现像，需要在web.xml里面定义👇
+
+```xml
+<!--静态资源的名字和controller的路径名字相同，需要特殊配置让其走tomcat默认的servlet-->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/login.html</url-pattern>
+    <url-pattern>/regist.html</url-pattern>
+  </servlet-mapping>
+```
+
+
+
+### mvc:interceptors拦截器的用法
+
+[mvc:interceptors拦截器的用法](https://www.cnblogs.com/lcngu/p/7096597.html)
+
+### 阿里云服务器25端口的问题
+
+ Could not connect to SMTP host: smtp.163.com, port: 25，阿里云服务器封禁了25，解决办法是使用465端口👇
+
+```java
+package org.suyuesheng.spring7.util;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
+
+/**
+ * 发邮件工具类
+ */
+public final class MailUtils {
+    private static final String USER = "sys088519@163.com"; // 发件人称号，同邮箱地址
+    private static final String PASSWORD = "授权码"; // 如果是qq邮箱可以使户端授权码，或者登录密码
+
+    /**
+     *
+     * @param to 收件人邮箱
+     * @param text 邮件正文
+     * @param title 标题
+     */
+    /* 发送验证信息的邮件 */
+    public static boolean sendMail(String to, String text, String title){
+        try {
+            final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+            final Properties props = new Properties();
+            props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
+            props.setProperty("mail.smtp.socketFactory.fallback", "false");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.host", "smtp.163.com");
+            props.setProperty("mail.smtp.port", "465");
+            props.setProperty("mail.smtp.socketFactory.port", "465");
+            // 发件人的账号
+            props.put("mail.user", USER);
+            //发件人的密码
+            props.put("mail.password", PASSWORD);
+
+            // 构建授权信息，用于进行SMTP进行身份验证
+            Authenticator authenticator = new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    // 用户名、密码
+                    String userName = props.getProperty("mail.user");
+                    String password = props.getProperty("mail.password");
+                    return new PasswordAuthentication(userName, password);
+                }
+            };
+            // 使用环境属性和授权信息，创建邮件会话
+            Session mailSession = Session.getInstance(props, authenticator);
+
+            // 创建邮件消息
+            MimeMessage message = new MimeMessage(mailSession);
+            // 设置发件人
+            String username = props.getProperty("mail.user");
+            /**
+             * 发件人地址：sys088519@163.com
+             * 发件人姓名：节能减排小组
+             */
+            InternetAddress form = new InternetAddress(username, "节能减排小组");
+            message.setFrom(form);
+            // 设置收件人
+            InternetAddress toAddress = new InternetAddress(to);
+            message.setRecipient(Message.RecipientType.TO, toAddress);
+
+            // 设置邮件标题
+            message.setSubject(title);
+
+            // 设置邮件的内容体
+            message.setContent(text, "text/html;charset=UTF-8");
+            // 发送邮件
+            Transport.send(message);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void main(String[] args) throws Exception { // 做测试用
+        MailUtils.sendMail("1446942825@qq.com","<h1>测试邮件，无须回复</h1><hr><p>这是一封测试邮件</p>","测试");
+        System.out.println("发送成功");
+    }
+
+
+
+}
+```
+
+使用465端口还有一个证书的问题👉`[javax.net.ssl.SSLException](http://javax.net.ssl.sslexception/): java.lang.RuntimeException: Unexpected error: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty`解决办法是👉https://blog.csdn.net/yu849893679/article/details/86081562
+
+### tomcat的项目，不同端口访问的问题
+
+https://blog.csdn.net/gang_strong/article/details/29415301
