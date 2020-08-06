@@ -85,7 +85,7 @@ q: 查看命令行历史
 
 ### 6.撤销和反撤销
 
-![image-20200423132149570](vim%E7%AC%94%E8%AE%B0.assets/image-20200423132149570.png)
+![image-20200423132149570](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523113753.png)
 
 ### 历史命令
 
@@ -103,7 +103,7 @@ q: 查看命令行历史
 
 `:{作用范围}s/{目标}/{替换}/{替换标志}`
 
-![image-20200421112349307](vim%E7%AC%94%E8%AE%B0.assets/image-20200421112349307.png)
+![image-20200421112349307](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523113754.png)
 
 
 

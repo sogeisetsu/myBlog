@@ -4,7 +4,7 @@
 
 ## 1.0 jar包依赖
 
-![](http://q9efxddri.bkt.clouddn.com/20200508220019.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523105806.png)
 
 ### 1.0.1 maven 的tomcat配置
 
@@ -24,7 +24,7 @@
 
 ## 1.1 文件结构
 
-![](http://q9efxddri.bkt.clouddn.com/20200508215151.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523105927.png)
 
 ## 1.2 具体文件内容
 
@@ -123,7 +123,7 @@ ${msg}
 
 # 2 spring mvc的路
 
-![img](https://upload-images.jianshu.io/upload_images/5220087-3c0f59d3c39a12dd.png?imageMogr2/auto-orient/strip|imageView2/2/w/1002/format/webp)
+![img](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110007)
 
 https://www.jianshu.com/p/8a20c547e245
 
@@ -846,7 +846,7 @@ https://www.cnblogs.com/gemeiyi/p/11045640.html
 
 ### 6.3.2 json数据的读取
 
-![](http://q9efxddri.bkt.clouddn.com/20200513002153.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110305.png)
 
 ### 6.3.2 表单转为json
 
@@ -951,7 +951,7 @@ https://blog.csdn.net/weixin_39220472/article/details/80725574   👈此文章�
     }
     ```
 
-    ![](http://q9efxddri.bkt.clouddn.com/20200513010014.png)
+    ![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110412.png)
     
 
 - 向前端传map
@@ -973,7 +973,7 @@ https://blog.csdn.net/weixin_39220472/article/details/80725574   👈此文章�
     }
     ```
 
-    ![](http://q9efxddri.bkt.clouddn.com/20200513010348.png)
+    ![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110306.png)
 
 - 传list
 
@@ -1000,13 +1000,13 @@ https://blog.csdn.net/weixin_39220472/article/details/80725574   👈此文章�
     }
     ```
 
-    ![](http://q9efxddri.bkt.clouddn.com/20200513013948.png)
+    ![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110307.png)
 
 # 7 联系mybatis
 
 ## 7.0.1 文件结构
 
-![](http://q9efxddri.bkt.clouddn.com/20200515164852.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110308.png)
 
 ## github地址
 
@@ -1448,7 +1448,7 @@ log4j.logger.java.sql=DEBUG
 
 http://106.14.162.154:8086/
 
-![](http://q9efxddri.bkt.clouddn.com/20200521173132.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110312.png)
 
 ## 8.2 代码文件
 
@@ -1492,11 +1492,11 @@ alter table User add `email` varchar(25);
 
 ### 配置文件关系图
 
-![](http://q9efxddri.bkt.clouddn.com/20200521173952.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110310.png)
 
 ### 导包
 
-![](http://q9efxddri.bkt.clouddn.com/20200521201211.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110311.png)
 
 ### web.xml
 
@@ -1810,7 +1810,7 @@ https://my.oschina.net/wangyongzhi/blog/631200
 
 ### spring mvc路径匹配原则
 
-![](http://q9efxddri.bkt.clouddn.com/20200521180449.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523110309.png)
 
 ### 静态资源和controller重名
 
@@ -1930,3 +1930,185 @@ public final class MailUtils {
 ### tomcat的项目，不同端口访问的问题
 
 https://blog.csdn.net/gang_strong/article/details/29415301
+
+# 9 SpringMvc上传文件
+
+## 0 学习链接
+
+[Spring MVC 上传文件(upload files)](https://www.cnblogs.com/hamawep789/p/10923722.html)
+
+[ajax上传带文件的form表单，springmvc接收](https://blog.csdn.net/m0_37572458/article/details/78797614)
+
+[SpringMVC 单文件上传与多文件上传](https://juejin.im/post/594b31da1b69e60062a199fa)
+
+## 1 前期准备
+
+需要Multipart，所以需引入👇
+
+```xml
+<dependency>
+    <groupId>commons-fileupload</groupId>
+    <artifactId>commons-fileupload</artifactId>
+    <version>1.3.2</version>
+</dependency>
+```
+
+### 1.1 在spring容器中引入CommonsMultipartResolver👇
+
+```xml
+<bean id="multipartResolver"
+      class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!--上传文件的最大大小，单位为字节 -->
+    <property name="maxUploadSize" value="17367648787"></property>
+    <!-- 上传文件的编码 -->
+    <property name="defaultEncoding" value="UTF-8"></property>
+</bean>
+```
+
+CommonsMultipartResolver有多个属性👇
+
+> maxUploadSize 上传的最大字节数，-1代表没有任何限制
+> maxInMemorySize 读取文件到内存中最大的字节数，默认是1024
+> defaultEncoding 文件上传头部编码，默认是iso-8859-1，注意defaultEncoding必须和用户的jsp的pageEncoding属性一致，以便能正常读取文件
+> uploadTempDir文件上传暂存目录，文件上传完成之后会清除该目录，模式是在servlet容器的临时目录，例如tomcat的话，就是在tomcat文件夹的temp目录
+>
+> maxUploadSizePerFile 跟maxUploadSize差不多，不过maxUploadSizePerFile是限制每个上传文件的大小，而maxUploadSize是限制总的上传文件大小
+>
+> ------------------------------------------------
+> 版权声明：本文为CSDN博主「node2017」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/yingxiake/article/details/51148540
+
+CommonsMultipartResolver的原理👉https://blog.csdn.net/suifeng3051/article/details/51659731
+
+## 2 文件的上传
+
+https://github.com/sogeisetsu/springstudyy/tree/master/springmvc-09
+
+## 2.1 使用Ajax上传带文件的表单
+
+```javascript
+$('#tbutton').click(function () {
+    let formData = new FormData($('#tform')[0]);
+    $.ajax({
+        url:"/h3",
+        type:"POST",
+        data:formData,
+        contentType:false,
+        // 告诉jQuery不要去处理发送的数据，用于对data参数进行序列化处理 这里必须false
+        processData:false,
+        cache:false,
+        success:function (data) {
+            console.log(data);
+        }
+    })
+})
+```
+
+https://www.jianshu.com/p/380661f02997
+
+在Ajax里面，表单data用FormData，记得要设置`contentType:false`和`processData:false`
+
+## 2.2 使用springmvc接收上传的文件
+
+有两种方法，一种是直接用MultipartFile接收，第二种方法是用MultipartHttpServletRequest来getFile来获取上传的file
+
+关于MultipartFile👇
+
+![](https://suyuesheng-biaozhun-blog-tupian.oss-cn-qingdao.aliyuncs.com/blogimg/20200525000819.png)
+
+**接收文件的代码👇**
+
+```java
+@RequestMapping(value = "/h3",method = RequestMethod.POST)
+public Object three(MultipartHttpServletRequest request){
+    MultipartFile file = request.getFile("file");
+    String contentType = file.getContentType();
+    System.out.println("文件类型"+contentType);
+    String filename = file.getOriginalFilename();
+    String realPath = request.getSession().getServletContext().getRealPath("/WEB-INF/file");
+    boolean b = UploadFileUtil.uploadFile(file, realPath);
+    if(b){
+        System.out.println("创建文件成功"+"\t"+filename);
+    }else {
+        System.out.println("文件创建失败");
+    }
+    return JSON.toJSON(new User("老刘", "12354657"));
+}
+```
+
+```java
+package org.suyuesheng.spring09.util;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+public class UploadFileUtil {
+    public static boolean uploadFile(MultipartFile file,String path){
+        try {
+            String filename = file.getOriginalFilename();
+            File realFile = new File(path, filename);
+            if(!realFile.getParentFile().exists()){
+                realFile.getParentFile().mkdirs();
+            }
+            if(realFile.exists()){
+                String newFileName = new Random().nextInt(100) + filename;
+                realFile.renameTo(new File(path, newFileName));
+            }
+            file.transferTo(realFile);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}
+
+```
+
+**关于@RestController**
+
+相当于controller加responseBody
+
+# 10 springmvc下载文件
+
+## DEMO
+
+```java
+@GetMapping("/xiazai")
+public void four(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    long start = System.currentTimeMillis();
+    String path = request.getSession().getServletContext().getRealPath("/file");
+    String filename="Mybatis第一天讲义.pdf";
+    //刷新，不留缓存
+    response.reset();
+
+    //        response.setCharacterEncoding("UTF-8"); 因为监听器已经提前设置了request编码，所以不用额外设置
+    //文件类型（二进制）
+    response.setContentType("multipart/form-data");
+    //3.Content-Disposition常用取值有：attachment和inline，
+
+    //attachment：打开下载框
+
+    //inline：将文件直接显示在页面
+
+    response.setHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(filename, "UTF-8"));
+    //👆切记，要将文件名编码
+    OutputStream outputStream = response.getOutputStream();
+    File file = new File(path, filename);
+    System.out.println(file.getCanonicalPath());
+    FileInputStream inputStream = new FileInputStream(file);
+    int temp=0;
+    byte[] bb = new byte[1024*1024];
+    while ((temp=inputStream.read(bb))!=-1){
+        outputStream.write(bb, 0, temp);
+    }
+    outputStream.close();
+    inputStream.close();
+    long end = System.currentTimeMillis();
+    System.out.println("花费"+(end-start)+"毫秒");
+}
+```
+

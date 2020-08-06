@@ -64,7 +64,7 @@ spring是轻量级的**控制反转 （IOC）面向切面编程（AOP）**框架
 >
 > Spring 框架的功能可以用在任何 J2EE 服务器中，大多数功能也适用于不受管理的环境。Spring 的核心要点是：支持不绑定到特定 J2EE 服务的可重用业务和数据访问对象。毫无疑问，这样的对象可以在不同 J2EE 环境 （Web 或 EJB）、独立应用程序、测试环境之间重用。
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200429140132.png"/>
+<img src="https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112510.png"/>
 
 # 2. IOC理论
 
@@ -74,7 +74,7 @@ https://www.zhihu.com/question/23277575
 
 [跳过该图👇](#IOC本质)
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200429143203.png"/>
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523111945.png)
 
 https://blog.csdn.net/weixin_44823472/article/details/97787171
 
@@ -92,7 +92,7 @@ https://blog.csdn.net/weixin_44823472/article/details/97787171
 
 ## 3.1 需要导入的包
 
-![](http://q9efxddri.bkt.clouddn.com/20200502033623.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112248.png)
 
 ## 3.2 **面试题 IOC是什么？**
 
@@ -1158,11 +1158,11 @@ https://www.jianshu.com/p/49a0929a8cac
 </beans>
 ```
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200501013459.png"/>
+<img src="https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112249.png"/>
 
 **要使用注解开发，必须要有这个包👇**
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200501013632.png"/>
+<img src="https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112250.png"/>
 
 ## @Component
 
@@ -1397,7 +1397,7 @@ public void testOne() {
 
 [代理设计模式介绍](https://segmentfault.com/a/1190000011291179#item-3)
 
-<img src="http://q9efxddri.bkt.clouddn.com/20200502023924.png" style="zoom: 200%;" />
+<img src="https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112251.png" style="zoom: 200%;" />
 
 ## 10.3 AOP
 
@@ -2005,7 +2005,7 @@ https://www.cnblogs.com/sogeisetsu/p/12779674.html
 
 **这样，就有如下的包**
 
-![](http://q9efxddri.bkt.clouddn.com/20200503051222.png)
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112252.png)
 
 ## Beans.xml
 
