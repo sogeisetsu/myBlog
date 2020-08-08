@@ -633,7 +633,7 @@ public void testCNameSpace(){
 }
 ```
 
-# 7 <a name="Bean的作用域">Bean的作用域</a>
+# 7 <a name="Bean的作用域">Bean的作用域</a> scope
 
 | Scope                                                        | Description                                                  |
 | :----------------------------------------------------------- | :----------------------------------------------------------- |
@@ -686,12 +686,12 @@ bean里面的一个属性 `<bean id="user" class="org.suyuesheng.spring.s03.pojo
 
 # 8 自动装配 `autowire`
 
-| Mode          | Explanation                                                  |
-| :------------ | :----------------------------------------------------------- |
-| `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system. |
-| `byName`      | Autowiring by property name. Spring looks for a bean with the same name as the property that needs to be autowired. For example, if a bean definition is set to autowire by name and it contains a `master` property (that is, it has a `setMaster(..)` method), Spring looks for a bean definition named `master` and uses it to set the property. |
-| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set). |
-| `constructor` | Analogous to `byType` but applies to constructor arguments. If there is not exactly one bean of the constructor argument type in the container, a fatal error is raised. |
+| Mode          | Explanation                                                  | 译文                                                         |
+| :------------ | :----------------------------------------------------------- | ------------------------------------------------------------ |
+| `no`          | (Default) No autowiring. Bean references must be defined by `ref` elements. Changing the default setting is not recommended for larger deployments, because specifying collaborators explicitly gives greater control and clarity. To some extent, it documents the structure of a system. | (默认)无自动布线。Bean引用必须由`ref`元素定义。对于较大的展开，建议不要更改默认设置，因为明确指定协作者可以提供更好的控制和清晰度。在某种程度上，它记录了系统的结构。 |
+| `byName`      | Autowiring by property name. Spring looks for a bean with the same name as the property that needs to be autowired. For example, if a bean definition is set to autowire by name and it contains a `master` property (that is, it has a `setMaster(..)` method), Spring looks for a bean definition named `master` and uses it to set the property. | 按属性名称自动连接。Spring查找与需要自动绑定的属性同名的bean。例如，如果Bean定义设置为按名称自动布线，并且它包含一个`master`属性(即它有一个`setMaster(..)`方法)，则Spring会查找名为`master`的Bean定义，并使用它来设置该属性。 |
+| `byType`      | Lets a property be autowired if exactly one bean of the property type exists in the container. If more than one exists, a fatal exception is thrown, which indicates that you may not use `byType` autowiring for that bean. If there are no matching beans, nothing happens (the property is not set). | ‘如果容器中只存在一个属性类型的bean，则允许自动配置属性。如果存在多个，则抛出致命异常，指示不能对该bean使用`byType`自动布线。如果没有匹配的bean，则不会发生任何事情(未设置该属性)。 |
+| `constructor` | Analogous to `byType` but applies to constructor arguments. If there is not exactly one bean of the constructor argument type in the container, a fatal error is raised. | 类似于`byType`，但适用于构造函数参数。如果容器中没有恰好一个构造函数参数类型的bean，则会引发致命错误。 |
 
 ## 8.0 在`bean`中配置`autowire`属性
 
@@ -717,6 +717,8 @@ https://blog.ahao.moe/posts/Spring_uses_@Autowired_in_three_ways.html
 > 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 ### 8.1.1 前言 配置的头部文件
+
+***注意： 在xml文件中配置自动注入时，即仅使用`<bean autowire="byName"/>`时无须使用此章节的头部文件，只有涉及到注解时才会用到本章所说的头部文件***
 
 头部必须加`xmlns:context="http://www.springframework.org/schema/context"`
 
@@ -1180,7 +1182,9 @@ https://www.jianshu.com/p/49a0929a8cac
 public class User
 ```
 
-`@Component`后面跟括号，括号里面的值**相当于bean的id**
+`@Component`后面跟括号，括号里面的值**相当于bean的id**，不可以设置多个别名
+
+**不加括号的话就相当于 id为类名称首字母小写的bean，一旦加上括号，默认的首字母小写就无效了**
 
 ### @Component的衍生
 
@@ -1480,11 +1484,18 @@ public void testOne() {
 >
 > - 这些术语可能翻译过来不太好理解，但对我们正常使用AOP的话**影响并没有那么大**~~看多了就知道它是什么意思了。
 >
->
 > 作者：Java3y
 > 链接：https://juejin.im/post/5b06bf2df265da0de2574ee1
 > 来源：掘金
 > 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+### **连接点和切点的区别**
+
+连接点是一个概念，他是所有能被拦截的地方的集合。切点是定义的某一个要被拦截的连接点点(比如定义为within(com.xx.y.*)定义的拦截点就是com.xx.y包下所有的连接点)，定义切点的目的是给advice指定发生作用的位置。
+
+
+
+![](https://suyuesheng-biaozhun-blog-tupian.oss-cn-qingdao.aliyuncs.com/blogimg/20200808171213.png)
 
 ### <a name="advice 的类型">**10.3.4 advice 的类型**</a>
 
@@ -1896,7 +1907,6 @@ Semantics</a> section of the AspectJ Programming Guide for more information.</p>
 </ul>
 </div>
 </div>
-
 #### 注解配置aop的代码👇
 
 ```java
