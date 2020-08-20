@@ -182,6 +182,8 @@ https://www.jianshu.com/p/8a20c547e245
 
 ## 控制器配置👇
 
+**`RequestMapping`后面的value可以加斜杠也可以不加斜杠，效果都是一样的**
+
 ```java
 package org.spring.suyuesheng.mvc.controller;
 
@@ -715,7 +717,7 @@ public String hello7(@ModelAttribute(value = "username") String username, ModelM
 
 ### <a name="@ResponseBody乱码问题解决">@ResponseBody乱码问题解决</a>
 
-配置spring容器👇
+配置spring容器👇（**这个方法有缺陷，即使用@Datetimeformat会报错**）[**解决responsebody乱码问题最佳解决方案**](#解决responsebody乱码问题最佳解决方案)
 
 ```xml
 <!--        @Response乱码问题解决-->
@@ -738,6 +740,21 @@ public String hello7(@ModelAttribute(value = "username") String username, ModelM
 ```
 
 *其他解决办法👉 https://blog.csdn.net/cckevincyh/article/details/81227864   https://www.cnblogs.com/zou-zou/p/9345485.html*
+
+### <a name="解决responsebody乱码问题最佳解决方案">解决responsebody乱码问题最佳解决方案</a>
+
+```xml
+<mvc:annotation-driven >
+    <!-- 消息转换器 -->
+    <mvc:message-converters register-defaults="true">
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+            <property name="supportedMediaTypes" value="text/html;charset=UTF-8"/>
+        </bean>
+    </mvc:message-converters>
+</mvc:annotation-driven>
+```
+
+
 
 ## 5.3 小知识，乱码问题
 
@@ -1797,6 +1814,8 @@ https://www.cnblogs.com/daxin/p/3545040.html
 
 ###  aop中的propagation的7种配置的意思
 
+[可能是最漂亮的Spring事务管理详解](https://juejin.im/post/6844903608224333838#heading-12)
+
 https://my.oschina.net/wangyongzhi/blog/631200
 
 > 下面是Spring中Propagation类的事务属性详解： 
@@ -1940,6 +1959,8 @@ https://blog.csdn.net/gang_strong/article/details/29415301
 [ajax上传带文件的form表单，springmvc接收](https://blog.csdn.net/m0_37572458/article/details/78797614)
 
 [SpringMVC 单文件上传与多文件上传](https://juejin.im/post/594b31da1b69e60062a199fa)
+
+[HTML上传文件的多种方式](https://www.jianshu.com/p/7636d5c60a8d)
 
 ## 1 前期准备
 

@@ -1385,6 +1385,8 @@ public void testOne() {
 
 *这个太基础，是java的基础内容，就只放个链接，https://segmentfault.com/a/1190000011291179#item-1*
 
+![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112252.png)
+
 ## 10.2 动态代理
 
 > 动态代理利用了[JDK API](http://tool.oschina.net/uploads/apidocs/jdk-zh/)，动态地在内存中构建代理对象，从而实现对目标对象的代理功能。动态代理又被称为JDK代理或接口代理。
@@ -1491,7 +1493,7 @@ public void testOne() {
 
 ### **连接点和切点的区别**
 
-连接点是一个概念，他是所有能被拦截的地方的集合。切点是定义的某一个要被拦截的连接点点(比如定义为within(com.xx.y.*)定义的拦截点就是com.xx.y包下所有的连接点)，定义切点的目的是给advice指定发生作用的位置。
+连接点是一个概念，他是所有能被拦截的地方的集合。切点是定义的某一个要被拦截的连接点(比如定义为within(com.xx.y.*)定义的拦截点就是com.xx.y包下所有的连接点)，定义切点的目的是给advice指定发生作用的位置。
 
 
 
@@ -2015,7 +2017,7 @@ https://www.cnblogs.com/sogeisetsu/p/12779674.html
 
 **这样，就有如下的包**
 
-![](https://suyueshengtuchuang.oss-cn-beijing.aliyuncs.com/20200523112252.png)
+![](https://suyuesheng-biaozhun-blog-tupian.oss-cn-qingdao.aliyuncs.com/blogimg/20200810032123.png)
 
 ## Beans.xml
 
